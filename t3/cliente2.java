@@ -10,7 +10,6 @@ class cliente2{
     Socket s;
     DataOutputStream enviar;
     DataInputStream receber;
-    Scanner ler = new Scanner(System.in);
 
     while (true) {
       try {
@@ -18,16 +17,18 @@ class cliente2{
         InetSocketAddress endereco = new InetSocketAddress("localhost", 4321);
         s.connect(endereco,1000);
 
+        Scanner ler = new Scanner(System.in);
         System.out.printf("Produto: ");
-        prod = ler.nextInt();
+        prod = ler.nextLine();
         System.out.printf("Quantidade: ");
         qtd = ler.nextInt();
+        // ler.close();
 
         enviar = new DataOutputStream(s.getOutputStream());
         enviar.writeUTF(prod);
         enviar.writeInt(qtd);
 
-        s.close();
+        // s.close();
       } catch( Exception e ) {
         System.out.println( e );
       }

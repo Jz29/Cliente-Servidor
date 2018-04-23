@@ -25,7 +25,7 @@ class servidor {
           //try{ st.join(); }
         }
       } catch( IOException e ) {
-      System.out.println( e );
+      System.out.println("Servidor: " + e );
     }
   }
 }

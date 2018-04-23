@@ -6,10 +6,10 @@ import java.io.*;
 
 class ServerThread extends Thread {
 
-  public String prod;
+  public String prod, aux;
   public int qtd;
   public boolean encontrou = false;
-  public ArrayList<Estoque> estoque;
+  public ArrayList<Estoque> estoque = new ArrayList<Estoque>();
   public Socket socket;
   public DataOutputStream enviar;
   public DataInputStream receber;
@@ -33,31 +33,36 @@ class ServerThread extends Thread {
         receber = new DataInputStream(socket.getInputStream());
         qtd = receber.readInt();
 
-        for (int x = 0; x < estoque.size() ; x++) {
-          if(estoque.get(x).produto == prod){
+        int x;
+        for (x = 0; x < estoque.size(); x++) {
+          System.out.println(x + " | " + estoque.get(x).produto + " | ");
+          if(estoque.get(x).produto.equals(prod)){
             encontrou = true;
             if(qtd < 0){ // DIMINUIR ESTOQUE
-              estoque.get(x).rm(prod, qtd);
+              this.aux = estoque.get(x).rm(prod, qtd);
               if(estoque.get(x).qtd == 0)
                 estoque.remove(x);
             }
             else
-              estoque.get(x).add(prod, qtd);
+              this.aux = estoque.get(x).add(prod, qtd);
           }
         }
+
+        System.out.println(this.aux);
 
         if (!encontrou){
           if(qtd < 0) // DIMINUIR ESTOQUE
-            System.out.println("Quantidade Insuficiente");
+            System.out.println("Produto Inexistente");
           else { // ADICIONAR O PRODUTO
-            Estoque aux = new Estoque(prod, qtd);
-            estoque.add(aux);
+            Estoque estq = new Estoque(prod, qtd);
+            estoque.add(estq);
+            System.out.println("Produto Adicionado!");
           }
         }
 
 
 
-        socket.close();
+        // socket.close();
       } catch( Exception e ) {
         System.out.println( e );
       }
