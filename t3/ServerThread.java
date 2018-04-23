@@ -33,9 +33,7 @@ class ServerThread extends Thread {
         receber = new DataInputStream(socket.getInputStream());
         qtd = receber.readInt();
 
-        int x;
-        for (x = 0; x < estoque.size(); x++) {
-          System.out.println(x + " | " + estoque.get(x).produto + " | ");
+        for (int x = 0; x < estoque.size(); x++) {
           if(estoque.get(x).produto.equals(prod)){
             encontrou = true;
             if(qtd < 0){ // DIMINUIR ESTOQUE
@@ -48,17 +46,26 @@ class ServerThread extends Thread {
           }
         }
 
-        System.out.println(this.aux);
 
         if (!encontrou){
           if(qtd < 0) // DIMINUIR ESTOQUE
-            System.out.println("Produto Inexistente");
+            this.aux = "Produto Inexistente";
           else { // ADICIONAR O PRODUTO
             Estoque estq = new Estoque(prod, qtd);
             estoque.add(estq);
-            System.out.println("Produto Adicionado!");
+            this.aux = "Estoque de " + prod + " e quantidade de: " + qtd;
           }
         }
+
+        enviar = new DataOutputStream(socket.getOutputStream());
+        if(this.aux == null)
+          enviar.writeUTF("A receber informações ");
+        else
+          enviar.writeUTF(this.aux);
+
+
+        for (int x = 0; x < estoque.size(); x++)
+          System.out.println("Produto: " + estoque.get(x).produto + "\t\t[" + estoque.get(x).qtd + "]");
 
 
 

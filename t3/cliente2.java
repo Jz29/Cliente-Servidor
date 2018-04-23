@@ -28,6 +28,9 @@ class cliente2{
         enviar.writeUTF(prod);
         enviar.writeInt(qtd);
 
+        receber = new DataInputStream(s.getInputStream());
+        System.out.println( receber.readUTF() );
+
         // s.close();
       } catch( Exception e ) {
         System.out.println( e );
