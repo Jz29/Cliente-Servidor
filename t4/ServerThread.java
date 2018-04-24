@@ -4,10 +4,13 @@ import java.io.*;
 
 
 class ServerThread extends Thread {
-
-  public Socket socket;
-  public DataOutputStream enviar;
-  public FileInputStream file;
+  int op;
+  Socket socket;
+  String instrucao, arquivo;
+  DataOutputStream enviar, up;
+  DataInputStream receber, down;
+  FileOutputStream fileOUT;
+  FileInputStream fileIN;
 
   ServerThread(Socket s){
     super();
@@ -17,25 +20,43 @@ class ServerThread extends Thread {
   public void run(){
 
     try {
-      // ENVIANDO ARQUIVO
-      enviar = new DataOutputStream(socket.getOutputStream());
-      file = new FileInputStream("S/server.txt");
-      byte[] buffer = new byte[10*1024];
-      while(file.read(buffer) > 0) {
-        enviar.write(buffer);
-		  }
-      enviar.flush();
-      file.close();
-      enviar.close();
 
-      // RECEBENDO ARQUIVO
-      // receber = new FileInputStream("server.txt");
-      // int lendoBytes = receber.read();
-      // while (lendoBytes != -1) {
-      //   System.out.println(lendoBytes);
-      //   lendoBytes = receber.read();
-      // }
-      // receber.close();
+      down = new DataInputStream(socket.getInputStream());
+      op = down.readInt();
+
+      byte[] buffer = new byte[10*1024];
+      switch (op) {
+        case 1: // ENVIANDO ARQUIVO
+          arquivo = down.readUTF();
+          enviar = new DataOutputStream(socket.getOutputStream());
+          fileIN = new FileInputStream("S/server.txt");
+          while(fileIN.read(buffer) > 0)
+            enviar.write(buffer);
+          enviar.flush();
+          fileIN.close();
+          enviar.close();
+          break;
+
+        case 2: // RECEBENDO ARQUIVO
+          arquivo = down.readUTF();
+          receber = new DataInputStream(socket.getInputStream());
+          fileOUT = new FileOutputStream("S/server.txt"); // salvar como
+          int lendoBytes = 0;
+          while ((lendoBytes = receber.read(buffer, 0, 10*1024)) > 0)
+            fileOUT.write(buffer, 0, lendoBytes);
+          fileOUT.close();
+          receber.close();
+          break;
+
+        case 3:
+          instrucao = down.readUTF();
+          Runtime run = Runtime.getRuntime();
+          run.exec(instrucao);
+          break;
+
+        default:
+          break;
+      }
 
       socket.close();
       // -----------------
