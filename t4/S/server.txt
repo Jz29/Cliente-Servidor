@@ -1,0 +1,2 @@
+arquivo do servidor
+\n fim do arquivo
